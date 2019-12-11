@@ -43,55 +43,48 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         title: Text(widget.title),
       ),
-      body: Column(
-        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-        children: <Widget>[
-          FutureBuilder(
-            future: _future,
-            initialData: "Initial data",
-            builder: (context, snapshot) {
-              switch (snapshot.connectionState) {
-                case ConnectionState.none:
+      body: Center(
+        child: FutureBuilder(
+          future: _future,
+          initialData: "Initial data",
+          builder: (context, snapshot) {
+            switch (snapshot.connectionState) {
+              case ConnectionState.none:
+                return Center(
+                  child: Text('None: ${snapshot.data}'),
+                );
+              case ConnectionState.active:
+              case ConnectionState.waiting:
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: <Widget>[
+                      CircularProgressIndicator(),
+                      Text(" Waiting: ${snapshot.data}"),
+                    ],
+                  ),
+                );
+              case ConnectionState.done:
+                if (snapshot.hasError) {
                   return Center(
-                    child: Text('None: ${snapshot.data}'),
+                    child: Text('异步请求出错'),
                   );
-                case ConnectionState.active:
-                case ConnectionState.waiting:
-                  return Center(
-                    child: Column(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        CircularProgressIndicator(),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Text(" Waiting: ${snapshot.data}"),
-                        )
-                      ],
-                    ),
-                  );
-                case ConnectionState.done:
-                  if (snapshot.hasError) {
-                    return Center(
-                      child: Text('异步请求出错'),
-                    );
-                  }
-                  return Center(
-                    child: Text("Contents: ${snapshot.data}"),
-                  );
-              }
-              return null;
-            },
-          ),
-          FlatButton(
-            color: Colors.grey,
-            child: Text("发起异步"),
-            onPressed: (){
-              setState(() {
-                _future = mockNetworkData();
-              });
-            },
-          ),
-        ],
+                }
+                return Center(
+                  child: Text("Done: ${snapshot.data}"),
+                );
+            }
+            return null;
+          },
+        ),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          setState(() {
+            _future = mockNetworkData();
+          });
+        },
+        child: Icon(Icons.add),
       ),
     );
   }
