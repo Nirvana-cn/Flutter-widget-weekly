@@ -64,8 +64,14 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
               ),
             ),
-            expandedHeight: 250.0,
+            expandedHeight: 200.0,
             pinned: true,
+            stretch: true,
+            stretchTriggerOffset: 50,
+            onStretchTrigger: () {
+              print("onStretchTrigger");
+              return;
+            },
           ),
           SliverFixedExtentList(
             itemExtent: 50.0,
