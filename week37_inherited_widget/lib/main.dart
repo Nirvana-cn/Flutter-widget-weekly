@@ -29,7 +29,6 @@ class MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<MyHomePage> {
   FavoriteFruit _fruit;
 
-
   @override
   void initState() {
     super.initState();
@@ -44,28 +43,26 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
       body: SharedDataWidget(
         fruit: _fruit,
-        child: Builder(
-          builder: (BuildContext innerContext) {
-            return Center(
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: <Widget>[
-                  Text(
-                      "My favorite fruit —— ${SharedDataWidget.of(innerContext).fruit.firstFavorite}"),
-                  Text(
-                      "My second favorite fruit —— ${SharedDataWidget.of(innerContext).fruit.secondFavorite}"),
-                  OutlinedButton(
-                    onPressed: () {
-                      this.setState(() {
-                        _fruit = FavoriteFruit("watermelon", "banana");
-                      });
-                    },
-                    child: Text("Update Data"),
-                  ),
-                ],
+        child: Column(
+          children: [
+            Expanded(
+              flex: 1,
+              child: WrapperWidget(),
+            ),
+            Expanded(
+              flex: 1,
+              child: Align(
+                child: OutlinedButton(
+                  onPressed: () {
+                    setState(() {
+                      _fruit = FavoriteFruit("watermelon", "banana");
+                    });
+                  },
+                  child: Text("Update Data"),
+                ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
@@ -86,7 +83,7 @@ class SharedDataWidget extends InheritedWidget {
 
   @override
   bool updateShouldNotify(SharedDataWidget oldWidget) {
-    return true;
+    return oldWidget.fruit != fruit;
   }
 
   static SharedDataWidget of(BuildContext context) {
@@ -97,9 +94,54 @@ class SharedDataWidget extends InheritedWidget {
   }
 }
 
+class WrapperWidget extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: DetailWidget(),
+    );
+  }
+}
+
+class DetailWidget extends StatefulWidget {
+  @override
+  State<StatefulWidget> createState() => _DetailState();
+}
+
+class _DetailState extends State<DetailWidget> {
+  @override
+  Widget build(BuildContext context) {
+    String firstFavorite = SharedDataWidget.of(context).fruit.firstFavorite;
+    String secondFavorite = SharedDataWidget.of(context).fruit.secondFavorite;
+
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: <Widget>[
+        Text("My favorite fruit —— $firstFavorite"),
+        Text("My second favorite fruit —— $secondFavorite"),
+      ],
+    );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    print("WrapperWidget didChangeDependencies");
+  }
+}
+
 class FavoriteFruit {
   String firstFavorite;
   String secondFavorite;
 
   FavoriteFruit(this.firstFavorite, this.secondFavorite);
+
+  @override
+  bool operator ==(Object other) {
+    if (!(other is FavoriteFruit)) {
+      return false;
+    }
+    FavoriteFruit old = other as FavoriteFruit;
+    return firstFavorite == old.firstFavorite && secondFavorite == old.secondFavorite;
+  }
 }
